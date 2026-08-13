@@ -1,0 +1,56 @@
+import asyncio
+
+from pydantic import BaseModel
+from sqlmodel import Field
+
+from metaorm import BaseRepository, BaseTable, DatabaseSettings
+
+
+class User(BaseModel):
+    id: int | None = None
+    name: str
+    email: str
+
+
+class UserTable(BaseTable[User], table=True):
+    __tablename__ = "users"
+
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    email: str = Field(unique=True)
+
+    @classmethod
+    def from_item(cls, item: User) -> "UserTable":
+        return cls(id=item.id, name=item.name, email=item.email)
+
+    def to_item(self) -> User:
+        return User(id=self.id, name=self.name, email=self.email)
+
+
+class UserRepository(BaseRepository):
+    def get_db_table(self) -> type[UserTable]:
+        return UserTable
+
+    def get_dto_type(self) -> type[User]:
+        return User
+
+
+async def main() -> None:
+    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = UserRepository(settings=settings)
+
+    await repository.create_tables()
+
+    # Create using DTO
+    user = await repository.create_item(
+        User(name="Alice", email="alice@example.com"),
+    )
+    print(f"Created DTO: {user.model_dump()}")
+
+    # Read all — returned as DTOs
+    items = [item async for item in repository.get_items()]
+    print(f"Items as DTOs: {[item.model_dump() for item in items]}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

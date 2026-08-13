@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metaorm"
+version = "0.2.0"
+description = "Async repository layer over SQLModel"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "Author Name", email = "author@example.com"},
+]
+keywords = [
+    "async",
+    "database",
+    "orm",
+    "repository",
+    "sqlmodel",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-filters @ git+https://github.com/so-saf/pydantic-filters.git",
+    "sqlalchemy>=2.0",
+    "sqlmodel>=0.0.22",
+]
+
+[project.urls]
+Homepage = "https://github.com/OlegYurchik/metaorm"
+Repository = "https://github.com/OlegYurchik/metaorm"
+Issues = "https://github.com/OlegYurchik/metaorm/issues"
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.22.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.2",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["metaorm*"]
+
+[tool.ruff.lint]
+ignore = ["RUF022"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+
+[tool.uv.sources]
+pydantic-filters = { git = "https://github.com/so-saf/pydantic-filters" }
