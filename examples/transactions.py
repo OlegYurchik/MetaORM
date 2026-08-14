@@ -1,8 +1,6 @@
 import asyncio
 
-from sqlmodel import Field
-
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
+from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings
 
 
 class ProductTable(BaseTable, table=True):
@@ -13,13 +11,17 @@ class ProductTable(BaseTable, table=True):
     price: float
 
 
-class ProductRepository(BaseRepository):
-    def get_db_table(self) -> type[ProductTable]:
-        return ProductTable
+class ProductFilter(BaseFilter):
+    name: str | None = None
+    price: int | None = None
+
+
+class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilter):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     repository = ProductRepository(settings=settings)
 
     await repository.create_tables()
@@ -34,10 +36,23 @@ async def main() -> None:
         )
         print(f"Created in transaction: {product1.name}, {product2.name}")
 
-    # Nested transaction reuses existing session
+    # Reusing an existing session (no new savepoint)
     async with repository.transaction(), repository.transaction():
         items = [item async for item in repository.get_items()]
-        print(f"Items in nested transaction: {len(items)}")
+        print(f"Items in reused session: {len(items)}")
+
+    # True nested transaction (savepoint) via repository
+    try:
+        async with repository.nested_transaction():
+            await repository.create_item(
+                ProductTable(name="Keyboard", price=79.99),
+            )
+            raise ValueError("Rollback nested")
+    except ValueError:
+        pass
+
+    count = await repository.get_items_count()
+    print(f"Items after nested rollback: {count}")  # 2
 
 
 if __name__ == "__main__":

@@ -1,8 +1,13 @@
 import pytest
-from pydantic_filters import BaseSort, OffsetPagination
 from sqlalchemy.orm import joinedload
 
-from metaorm import AlreadyExistsError, DatabaseSettings, HaveNoSessionError
+from metaorm import (
+    AlreadyExistsError,
+    BaseRepository,
+    BaseSort,
+    OffsetPagination,
+    RepositorySettings,
+)
 from tests.models import (
     AuthorRepository,
     AuthorTable,
@@ -12,18 +17,13 @@ from tests.models import (
     ProductRepository,
     ProductTable,
     User,
+    UserFilter,
     UserRepository,
+    UserTable,
 )
 
 
 class TestBaseRepository:
-    async def test_session_raises_error_without_transaction(
-        self,
-        user_repository: UserRepository,
-    ) -> None:
-        with pytest.raises(HaveNoSessionError):
-            _ = user_repository.session
-
     async def test_create_item(self, user_repository: UserRepository) -> None:
         user = User(name="Alice", email="alice@example.com")
 
@@ -93,12 +93,29 @@ class TestBaseRepository:
         with pytest.raises(AlreadyExistsError):
             await user_repository.create_item(user)
 
-    async def test_transaction_reuses_existing_session(
+    async def test_transaction_scope_allows_crud(
         self,
         user_repository: UserRepository,
     ) -> None:
         async with user_repository.transaction():
-            _ = user_repository.session
+            count = await user_repository.get_items_count()
+        assert count == 0
+
+    async def test_session_is_none_without_transaction(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        assert user_repository.session is None
+
+    async def test_session_returns_session_inside_transaction(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        from sqlmodel.ext.asyncio.session import AsyncSession
+
+        async with user_repository.transaction() as session:
+            assert isinstance(user_repository.session, AsyncSession)
+            assert user_repository.session is session
 
     async def test_get_items_with_pagination(
         self,
@@ -147,11 +164,83 @@ class TestBaseRepository:
         assert created.name == "Widget"
 
     async def test_get_filter_type(self) -> None:
-        repository = ProductRepository(settings=DatabaseSettings())
+        product_repository = ProductRepository(settings=RepositorySettings())
+        user_repository = UserRepository(settings=RepositorySettings())
 
-        filter_type = repository.get_filter_type()
+        assert product_repository.get_filter_type() is ProductFilter
+        assert user_repository.get_filter_type() is UserFilter
 
-        assert filter_type is ProductFilter
+    async def test_get_dto_type(self) -> None:
+        product_repository = ProductRepository(settings=RepositorySettings())
+        user_repository = UserRepository(settings=RepositorySettings())
+
+        assert product_repository.get_dto_type() is None
+        assert user_repository.get_dto_type() is User
+
+    async def test_get_items_count_with_filter(
+        self,
+        product_repository_settings: ProductRepository,
+    ) -> None:
+        await product_repository_settings.create_item(
+            ProductTable(name="Alpha", price=10.0),
+        )
+        await product_repository_settings.create_item(
+            ProductTable(name="Beta", price=20.0),
+        )
+
+        count = await product_repository_settings.get_items_count(
+            filter_=ProductFilter(name="Alpha"),
+        )
+
+        assert count == 1
+
+    async def test_delete_items_with_filter(
+        self,
+        product_repository_settings: ProductRepository,
+    ) -> None:
+        await product_repository_settings.create_item(
+            ProductTable(name="Alpha", price=10.0),
+        )
+        await product_repository_settings.create_item(
+            ProductTable(name="Beta", price=20.0),
+        )
+
+        await product_repository_settings.delete_items(
+            filter_=ProductFilter(name="Alpha"),
+        )
+
+        count = await product_repository_settings.get_items_count()
+        assert count == 1
+
+        remaining = [item async for item in product_repository_settings.get_items()]
+        assert remaining[0].name == "Beta"
+
+    async def test_update_items_with_filter(
+        self,
+        product_repository_settings: ProductRepository,
+    ) -> None:
+        await product_repository_settings.create_item(
+            ProductTable(name="Alpha", price=10.0),
+        )
+        await product_repository_settings.create_item(
+            ProductTable(name="Beta", price=20.0),
+        )
+
+        updated = [
+            item
+            async for item in product_repository_settings.update_items(
+                filter_=ProductFilter(name="Alpha"),
+                name="Gamma",
+            )
+        ]
+
+        assert len(updated) == 1
+        assert updated[0].name == "Gamma"
+
+        all_items = [item async for item in product_repository_settings.get_items()]
+        assert len(all_items) == 2
+        names = {item.name for item in all_items}
+        assert names == {"Gamma", "Beta"}
 
     async def test_get_items_with_filter(
         self,
@@ -217,3 +306,72 @@ class TestBaseRepository:
 
         assert len(updated) == 1
         assert updated[0].title == "Updated"
+
+    async def test_init_raises_without_container_or_settings(self) -> None:
+        with pytest.raises(TypeError):
+            BaseRepository()
+
+    async def test_repository_without_table_raises(self) -> None:
+        with pytest.raises(TypeError):
+            class BadRepository(BaseRepository, filter_=UserFilter):
+                pass
+
+    async def test_nested_transaction_property_allows_crud(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        async with user_repository.nested_transaction():
+            count = await user_repository.get_items_count()
+        assert count == 0
+
+    async def test_nested_transaction_rollbacks_inner_scope(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        with pytest.raises(ValueError):
+            async with user_repository.nested_transaction():
+                await user_repository.create_item(
+                    User(name="Alice", email="alice@example.com"),
+                )
+                raise ValueError("boom")
+
+        count = await user_repository.get_items_count()
+        assert count == 0
+
+    async def test_nested_transaction_in_outer_transaction_rollbacks_only_inner(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        async with user_repository.transaction():
+            await user_repository.create_item(
+                User(name="Bob", email="bob@example.com"),
+            )
+            with pytest.raises(ValueError):
+                async with user_repository.nested_transaction():
+                    await user_repository.create_item(
+                        User(name="Alice", email="alice@example.com"),
+                    )
+                    raise ValueError("boom")
+
+        count = await user_repository.get_items_count()
+        assert count == 1
+
+        items = [item async for item in user_repository.get_items()]
+        assert items[0].name == "Bob"
+
+    async def test_params_via_intermediate_base_class(self) -> None:
+        class IntermediateRepository(
+            BaseRepository,
+            table=UserTable,
+            filter_=UserFilter,
+            dto=User,
+        ):
+            pass
+
+        class ConcreteRepository(IntermediateRepository):
+            pass
+
+        repository = ConcreteRepository(settings=RepositorySettings())
+
+        assert repository.get_filter_type() is UserFilter
+        assert repository.get_dto_type() is User

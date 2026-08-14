@@ -10,12 +10,13 @@ metaorm/
     repositories.py      # BaseRepository
     tables.py            # BaseTable
     container.py         # RepositoriesContainer (session/transaction manager)
-    settings.py          # DatabaseSettings (Pydantic model)
+    settings.py          # RepositorySettings (Pydantic model)
     exceptions.py        # Domain exceptions
 examples/                # Usage examples
     basic_usage.py       # Simple CRUD with tables directly
-    dto_usage.py         # DTO mapping via get_dto_type()
+    dto_usage.py         # DTO mapping via dto= keyword
     transactions.py      # Explicit transaction management
+    nested_transactions.py # Savepoints and partial rollback
     filter_usage.py      # Query filters, pagination and sorting
     relationships.py     # Eager loading with joinedload/selectinload
     container_usage.py   # Multi-repository atomic transactions
@@ -49,20 +50,33 @@ If `ItemType` is not specified (e.g. `BaseTable` without generic arg), `from_ite
 
 ### BaseRepository
 
-`BaseRepository` is **not** a Generic class. Type behavior is controlled by overriding methods:
+`BaseRepository` uses `__init_subclass__` to enforce keyword arguments at class-definition time.
+
+- `table` — required. The SQLModel table class. Must be specified on the first concrete subclass; intermediate bases that already specify it do not need to repeat it.
+- `filter_` — required. A `BaseFilter` subclass.
+- `dto` — optional. When provided, repository methods map table rows to that DTO type.
+
+`table=` must be provided on the first subclass in the hierarchy.
+
+The following introspection helpers are available as classmethods:
+
+- `get_table_type()` — returns the `table` class specified at definition time.
+- `get_filter_type()` — returns the `filter_` class.
+- `get_dto_type()` — returns the `dto` class, or `None` if no DTO was set.
 
 ```python
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
-
-    def get_dto_type(self) -> type[User] | None:
-        return User  # Methods return User instances
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter, dto=User):
+    pass  # Methods return User instances
 ```
 
-If `get_dto_type()` returns `None` (default), repository methods return table instances directly (no DTO conversion). This is the simplest mode when you don't need a separate DTO layer.
+If `dto` is omitted, repository methods return table instances directly:
 
-If `get_filter_type()` returns a `BaseFilter` subclass, type hints on `filter_` parameters reflect that type. Note: `pydantic-filters` from GitHub is required for filter support (PyPI version is broken with pydantic v2).
+```python
+class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilter):
+    pass  # Methods return ProductTable instances
+```
+
+Note: `pydantic-filters` from GitHub is required for filter support (PyPI version is broken with pydantic v2). The project currently uses a fork with Python 3.14 lazy-annotations support: `git+https://github.com/OlegYurchik/pydantic-filters.git@fix/compare-to-pydantic-2.12`.
 
 #### Eager loading (options)
 
@@ -83,7 +97,7 @@ books = [
 
 ```python
 # Simple: create container internally
-repo = UserRepository(settings=DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:"))
+repo = UserRepository(settings=RepositorySettings(dsn="sqlite+aiosqlite:///:memory:"))
 
 # Advanced: reuse container for shared transactions
 container = RepositoriesContainer(settings=settings)
@@ -110,7 +124,8 @@ async with container.transaction():
 
 - Each repository method (`get_items`, `create_item`, etc.) wraps its operation in a transaction via `self.transaction()`.
 - `self.transaction()` reuses an existing session from the context if one exists, otherwise creates a new one.
-- Accessing `repository.session` outside a transaction raises `HaveNoSessionError`.
+- `repository.session` and `container.session` both return the current `AsyncSession` or `None` if no session is active. Both `repository.transaction()` and `container.transaction()` yield the `AsyncSession` and handle nested calls by reusing the same session.
+- `repository.nested_transaction()` and `container.nested_transaction()` create a SQLAlchemy savepoint (`begin_nested()`). When no outer session exists they start a new session with a savepoint. On exception the savepoint is rolled back, leaving any outer transaction unaffected.
 
 ## Development
 

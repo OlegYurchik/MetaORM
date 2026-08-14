@@ -1,8 +1,6 @@
 from pydantic import BaseModel
-from pydantic_filters import BaseFilter
-from sqlmodel import Field, Relationship
 
-from metaorm import BaseRepository, BaseTable
+from metaorm import BaseFilter, BaseRepository, BaseTable, Field, Relationship
 
 
 class User(BaseModel):
@@ -25,12 +23,13 @@ class UserTable(BaseTable[User], table=True):
         return User(id=self.id, name=self.name, email=self.email)
 
 
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
+class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None
 
-    def get_dto_type(self) -> type[User]:
-        return User
+
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter, dto=User):
+    pass
 
 
 class ProductTable(BaseTable, table=True):
@@ -45,12 +44,8 @@ class ProductFilter(BaseFilter):
     price: int | None = None
 
 
-class ProductRepository(BaseRepository):
-    def get_db_table(self) -> type[ProductTable]:
-        return ProductTable
-
-    def get_filter_type(self) -> type[ProductFilter]:
-        return ProductFilter
+class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilter):
+    pass
 
 
 class AuthorTable(BaseTable, table=True):
@@ -68,11 +63,18 @@ class BookTable(BaseTable, table=True):
     author: AuthorTable = Relationship(back_populates="books")
 
 
-class AuthorRepository(BaseRepository):
-    def get_db_table(self) -> type[AuthorTable]:
-        return AuthorTable
+class AuthorFilter(BaseFilter):
+    name: str | None = None
 
 
-class BookRepository(BaseRepository):
-    def get_db_table(self) -> type[BookTable]:
-        return BookTable
+class BookFilter(BaseFilter):
+    title: str | None = None
+    author_id: int | None = None
+
+
+class AuthorRepository(BaseRepository, table=AuthorTable, filter_=AuthorFilter):
+    pass
+
+
+class BookRepository(BaseRepository, table=BookTable, filter_=BookFilter):
+    pass

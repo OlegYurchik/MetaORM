@@ -1,9 +1,16 @@
 import asyncio
 
 from sqlalchemy.orm import joinedload
-from sqlmodel import Field, Relationship
 
-from metaorm import BaseRepository, BaseTable, DatabaseSettings, RepositoriesContainer
+from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseTable,
+    Field,
+    Relationship,
+    RepositoriesContainer,
+    RepositorySettings,
+)
 
 
 class AuthorTable(BaseTable, table=True):
@@ -23,18 +30,25 @@ class BookTable(BaseTable, table=True):
     author: AuthorTable = Relationship(back_populates="books")
 
 
-class BookRepository(BaseRepository):
-    def get_db_table(self) -> type[BookTable]:
-        return BookTable
+class BookFilter(BaseFilter):
+    title: str | None = None
+    author_id: int | None = None
 
 
-class AuthorRepository(BaseRepository):
-    def get_db_table(self) -> type[AuthorTable]:
-        return AuthorTable
+class AuthorFilter(BaseFilter):
+    name: str | None = None
+
+
+class BookRepository(BaseRepository, table=BookTable, filter_=BookFilter):
+    pass
+
+
+class AuthorRepository(BaseRepository, table=AuthorTable, filter_=AuthorFilter):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     container = RepositoriesContainer(settings=settings)
 
     author_repo = AuthorRepository(container=container)

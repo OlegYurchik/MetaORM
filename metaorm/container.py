@@ -6,13 +6,13 @@ from typing import TypeVar
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from .settings import DatabaseSettings
+from .settings import RepositorySettings
 
 RepositoryType = TypeVar("RepositoryType", bound="BaseRepository")  # noqa: F821
 
 
 class RepositoriesContainer:
-    def __init__(self, settings: DatabaseSettings):
+    def __init__(self, settings: RepositorySettings):
         engine_parameters = {
             "url": settings.dsn,
             "pool_recycle": settings.pool_recycle,
@@ -37,7 +37,7 @@ class RepositoriesContainer:
 
     @asynccontextmanager
     async def transaction(self) -> AsyncGenerator[AsyncSession, None]:
-        existing_session = self._session_context.get()
+        existing_session = self._session_context.get(None)
         if existing_session is not None:
             yield existing_session
             return
@@ -50,6 +50,26 @@ class RepositoriesContainer:
             token = self._session_context.set(session)
             try:
                 async with session.begin():
+                    yield session
+            finally:
+                self._session_context.reset(token)
+
+    @asynccontextmanager
+    async def nested_transaction(self) -> AsyncGenerator[AsyncSession, None]:
+        existing_session = self._session_context.get(None)
+        if existing_session is not None:
+            async with existing_session.begin_nested():
+                yield existing_session
+            return
+
+        session_parameters = {
+            "bind": self._engine,
+            "expire_on_commit": False,
+        }
+        async with AsyncSession(**session_parameters) as session:
+            token = self._session_context.set(session)
+            try:
+                async with session.begin_nested():
                     yield session
             finally:
                 self._session_context.reset(token)

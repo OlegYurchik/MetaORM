@@ -1,6 +1,14 @@
 # MetaORM
 
-Async repository layer over [SQLModel](https://sqlmodel.tiangolo.com). Provides a minimal, explicit pattern for database access with optional DTO mapping, automatic transaction management via `contextvars`, and built-in filter / pagination / sort support via `pydantic-filters`.
+Async repository layer over [SQLModel](https://sqlmodel.tiangolo.com). Define a table, a repository with keyword arguments, and you have a complete async CRUD layer.
+
+- **Minimal API** — `create_item`, `get_items`, `update_items`, `delete_items`. That's it.
+- **Built-in DTO mapping** — return table instances directly or map to separate Pydantic models.
+- **Intuitive transactions** — every CRUD call runs in a transaction; explicit `transaction()` context manager for custom scopes.
+- **Nested transactions (savepoints)** — `nested_transaction()` allows partial rollback inside a shared transaction.
+- **Multi-repo atomic transactions** — `RepositoriesContainer` lets several repositories share one atomic transaction.
+- **Filters, pagination, sorting** — powered by `pydantic-filters`.
+- **Eager loading** — pass SQLAlchemy `joinedload` / `selectinload` via `options`.
 
 ## Install
 
@@ -14,11 +22,8 @@ Requires Python `>=3.12`.
 
 ## Quick start
 
-The simplest mode works with SQLModel tables directly — no DTOs, no generics, no magic:
-
 ```python
-from sqlmodel import Field
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
+from metaorm import BaseFilter, BaseRepository, BaseTable, RepositorySettings, Field
 
 
 class UserTable(BaseTable, table=True):
@@ -28,129 +33,68 @@ class UserTable(BaseTable, table=True):
     email: str = Field(unique=True)
 
 
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
+class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None
+
+
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter):
+    pass
 
 
 async def main():
     repo = UserRepository(
-        settings=DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:"),
+        settings=RepositorySettings(dsn="sqlite+aiosqlite:///:memory:"),
     )
     await repo.create_tables()
 
-    user = await repo.create_item(
-        UserTable(name="Alice", email="alice@example.com"),
-    )
+    user = await repo.create_item(UserTable(name="Alice", email="alice@example.com"))
     print(user.id, user.name)
 
     all_users = [u async for u in repo.get_items()]
     print(len(all_users))
 ```
 
-## DTO mapping
+## Repository API
 
-When you want repository methods to return separate Pydantic models instead of table instances, override `get_dto_type()` and implement `from_item` / `to_item` on the table:
-
-```python
-from pydantic import BaseModel
-from sqlmodel import Field
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
-
-
-class User(BaseModel):
-    id: int | None = None
-    name: str
-
-
-class UserTable(BaseTable[User], table=True):
-    __tablename__ = "users"
-    id: int | None = Field(default=None, primary_key=True)
-    name: str
-
-    @classmethod
-    def from_item(cls, item: User) -> "UserTable":
-        return cls(id=item.id, name=item.name)
-
-    def to_item(self) -> User:
-        return User(id=self.id, name=self.name)
-
-
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
-
-    def get_dto_type(self) -> type[User]:
-        return User
-
-
-async def main():
-    repo = UserRepository(
-        settings=DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:"),
-    )
-    await repo.create_tables()
-
-    user = await repo.create_item(User(name="Alice"))
-    # user is a User DTO, not UserTable
-    print(user.model_dump())
-```
-
-## Filters, pagination and sorting
-
-`pydantic-filters` provides `BaseFilter`, `BasePagination` and `BaseSort`. Pass them to `get_items`:
+Subclass `BaseRepository` with keyword arguments `table`, `filter_`, and optionally `dto`:
 
 ```python
-from pydantic_filters import BaseFilter, BaseSort, OffsetPagination
-
-class BookFilter(BaseFilter):
-    title: str | None = None
-    year: int | None = None
+class MyRepository(BaseRepository, table=MyTable, filter_=MyFilter):
+    pass  # returns table instances directly
 
 
-class BookRepository(BaseRepository):
-    def get_db_table(self) -> type[BookTable]:
-        return BookTable
-
-    def get_filter_type(self) -> type[BookFilter]:
-        return BookFilter
-
-
-# Exact match filter
-filtered = [
-    item
-    async for item in repo.get_items(filter_=BookFilter(year=2025))
-]
-
-# Pagination
-page = [
-    item
-    async for item in repo.get_items(
-        pagination=OffsetPagination(offset=10, limit=20),
-    )
-]
-
-# Sorting
-sorted_items = [
-    item
-    async for item in repo.get_items(
-        sort=BaseSort(sort_by="year", sort_by_order="desc"),
-    )
-]
+class MyRepositoryWithDto(BaseRepository, table=MyTable, filter_=MyFilter, dto=MyDto):
+    pass  # maps rows to MyDto
 ```
 
-## Explicit transactions
+Keyword arguments are checked at class-definition time. If you forget `table` or `filter_`, Python raises `TypeError` immediately. `table=` must still be provided on the first subclass in the hierarchy.
 
-Each repository method already runs inside a transaction automatically. If you need an explicit scope (e.g. to read `repository.session`), use `repository.transaction()`:
+### Constructor
 
 ```python
-async with repo.transaction():
-    user = await repo.create_item(UserTable(name="Alice"))
-    # nested transaction reuses the same session
-    async with repo.transaction():
-        items = [item async for item in repo.get_items()]
+# Simple — container is created internally
+repo = MyRepository(settings=RepositorySettings(dsn="..."))
+
+# Advanced — share a container for atomic multi-repo transactions
+container = RepositoriesContainer(settings=settings)
+repo = MyRepository(container=container)
 ```
 
-## Atomic transactions across multiple repositories
+### Methods
+
+| Method | Signature | Description |
+|---|---|---|
+| `create_tables` | `async () -> None` | Creates the table in the database. |
+| `create_item` | `async (item) -> Any` | Inserts one row. Returns the table instance or DTO when `dto=` is set. |
+| `get_items` | `async (filter_=None, pagination=None, sort=None, options=None) -> AsyncGenerator[Any]` | Streams matching rows. `options` accepts SQLAlchemy eager-loading strategies such as `joinedload`. |
+| `get_items_count` | `async (filter_=None) -> int` | Returns the number of matching rows. |
+| `update_items` | `async (filter_=None, options=None, **values) -> AsyncGenerator[Any]` | Updates matching rows and yields the updated instances. |
+| `delete_items` | `async (filter_=None) -> None` | Deletes matching rows. |
+| `transaction` | `async contextmanager () -> AsyncSession` | Explicit transaction scope. Automatically used by all CRUD methods. Reuses an existing session when nested. |
+| `nested_transaction` | `async contextmanager () -> AsyncSession` | Creates a savepoint (nested transaction). Rolls back only the inner scope on error while leaving the outer transaction intact. |
+
+### Multi-repository transactions
 
 Use `RepositoriesContainer` when you need a single atomic transaction spanning multiple repositories:
 
@@ -166,22 +110,21 @@ async with container.transaction():
     await order_repo.create_item(OrderTable(user_id=user.id, total=100))
 ```
 
-`container.transaction()` stores the session in a `contextvars.ContextVar`. All repository operations within the `async with` block automatically reuse that session. Nested `container.transaction()` calls yield the same session.
+`container.transaction()` stores the session in a `contextvars.ContextVar`. All repository operations within the `async with` block automatically reuse that session. Nested `transaction()` calls yield the same session.
 
-## Eager loading
+For partial rollback inside a shared transaction use `container.nested_transaction()` (or `repository.nested_transaction()`). It creates a SQLAlchemy savepoint: an error inside the block rolls back only the savepoint, leaving the outer transaction open for further operations or commit.
 
-`get_items()` and `update_items()` accept an optional `options` parameter for SQLAlchemy eager loading strategies:
+## More examples
 
-```python
-from sqlalchemy.orm import joinedload
+See [`examples/`](examples/) for detailed usage patterns:
 
-books = [
-    item
-    async for item in book_repo.get_items(
-        options=[joinedload(BookTable.author)],
-    )
-]
-```
+- [`basic_usage.py`](examples/basic_usage.py) — CRUD with tables directly
+- [`dto_usage.py`](examples/dto_usage.py) — DTO mapping via `dto=` keyword
+- [`transactions.py`](examples/transactions.py) — Explicit transaction management
+- [`nested_transactions.py`](examples/nested_transactions.py) — Savepoints and partial rollback
+- [`filter_usage.py`](examples/filter_usage.py) — Query filters, pagination and sorting
+- [`relationships.py`](examples/relationships.py) — Eager loading with `joinedload`
+- [`container_usage.py`](examples/container_usage.py) — Multi-repository atomic transactions
 
 ## Exceptions
 

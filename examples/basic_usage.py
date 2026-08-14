@@ -1,8 +1,6 @@
 import asyncio
 
-from sqlmodel import Field
-
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
+from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings
 
 
 class UserTable(BaseTable, table=True):
@@ -13,13 +11,17 @@ class UserTable(BaseTable, table=True):
     email: str = Field(unique=True)
 
 
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
+class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None
+
+
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     repository = UserRepository(settings=settings)
 
     await repository.create_tables()

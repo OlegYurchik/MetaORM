@@ -1,8 +1,13 @@
 import asyncio
 
-from sqlmodel import Field
-
-from metaorm import BaseRepository, BaseTable, DatabaseSettings, RepositoriesContainer
+from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseTable,
+    Field,
+    RepositoriesContainer,
+    RepositorySettings,
+)
 
 
 class UserTable(BaseTable, table=True):
@@ -20,18 +25,24 @@ class OrderTable(BaseTable, table=True):
     total: float
 
 
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
+class UserFilter(BaseFilter):
+    name: str | None = None
 
 
-class OrderRepository(BaseRepository):
-    def get_db_table(self) -> type[OrderTable]:
-        return OrderTable
+class OrderFilter(BaseFilter):
+    user_id: int | None = None
+
+
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter):
+    pass
+
+
+class OrderRepository(BaseRepository, table=OrderTable, filter_=OrderFilter):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     container = RepositoriesContainer(settings=settings)
 
     user_repo = container.get_repository(UserRepository)
@@ -45,6 +56,19 @@ async def main() -> None:
         user = await user_repo.create_item(UserTable(name="Alice"))
         await order_repo.create_item(OrderTable(user_id=user.id, total=100.00))
         await order_repo.create_item(OrderTable(user_id=user.id, total=250.50))
+
+    # Nested transaction inside outer transaction (savepoint)
+    async with container.transaction():
+        user = await user_repo.create_item(UserTable(name="Bob"))
+        try:
+            async with container.nested_transaction():
+                await order_repo.create_item(
+                    OrderTable(user_id=user.id, total=999.99),
+                )
+                raise ValueError("Rollback nested order")
+        except ValueError:
+            pass
+        # Bob stays, the order is rolled back
 
     # Verify results
     users = [item async for item in user_repo.get_items()]

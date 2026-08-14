@@ -1,9 +1,14 @@
 import asyncio
 
-from pydantic_filters import BaseFilter, BaseSort, OffsetPagination
-from sqlmodel import Field
-
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
+from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseSort,
+    BaseTable,
+    Field,
+    OffsetPagination,
+    RepositorySettings,
+)
 
 
 class BookTable(BaseTable, table=True):
@@ -19,16 +24,12 @@ class BookFilter(BaseFilter):
     year: int | None = None
 
 
-class BookRepository(BaseRepository):
-    def get_db_table(self) -> type[BookTable]:
-        return BookTable
-
-    def get_filter_type(self) -> type[BookFilter]:
-        return BookFilter
+class BookRepository(BaseRepository, table=BookTable, filter_=BookFilter):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     repository = BookRepository(settings=settings)
 
     await repository.create_tables()

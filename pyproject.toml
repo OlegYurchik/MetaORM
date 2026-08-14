@@ -1,10 +1,6 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "metaorm"
-version = "0.2.0"
+version = "0.3.0"
 description = "Async repository layer over SQLModel"
 readme = "README.md"
 license = {text = "MIT"}
@@ -32,7 +28,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=2.0",
-    "pydantic-filters @ git+https://github.com/so-saf/pydantic-filters.git",
+    "pydantic-filters @ git+https://github.com/OlegYurchik/pydantic-filters.git@fix/compare-to-pydantic-2.12",
     "sqlalchemy>=2.0",
     "sqlmodel>=0.0.22",
 ]
@@ -41,6 +37,10 @@ dependencies = [
 Homepage = "https://github.com/OlegYurchik/metaorm"
 Repository = "https://github.com/OlegYurchik/metaorm"
 Issues = "https://github.com/OlegYurchik/metaorm/issues"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
@@ -67,4 +67,4 @@ fail_under = 90
 show_missing = true
 
 [tool.uv.sources]
-pydantic-filters = { git = "https://github.com/so-saf/pydantic-filters" }
+pydantic-filters = { git = "https://github.com/OlegYurchik/pydantic-filters", branch = "fix/compare-to-pydantic-2.12" }

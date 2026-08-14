@@ -1,9 +1,8 @@
 import asyncio
 
 from pydantic import BaseModel
-from sqlmodel import Field
 
-from metaorm import BaseRepository, BaseTable, DatabaseSettings
+from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings
 
 
 class User(BaseModel):
@@ -27,16 +26,17 @@ class UserTable(BaseTable[User], table=True):
         return User(id=self.id, name=self.name, email=self.email)
 
 
-class UserRepository(BaseRepository):
-    def get_db_table(self) -> type[UserTable]:
-        return UserTable
+class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None
 
-    def get_dto_type(self) -> type[User]:
-        return User
+
+class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter, dto=User):
+    pass
 
 
 async def main() -> None:
-    settings = DatabaseSettings(dsn="sqlite+aiosqlite:///:memory:")
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
     repository = UserRepository(settings=settings)
 
     await repository.create_tables()

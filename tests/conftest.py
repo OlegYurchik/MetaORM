@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 import pytest
 import pytest_asyncio
 
-from metaorm import DatabaseSettings, RepositoriesContainer
+from metaorm import RepositoriesContainer, RepositorySettings
 
 from .models import (
     AuthorRepository,
@@ -14,8 +14,8 @@ from .models import (
 
 
 @pytest.fixture
-def database_settings() -> DatabaseSettings:
-    return DatabaseSettings(
+def database_settings() -> RepositorySettings:
+    return RepositorySettings(
         dsn="sqlite+aiosqlite:///:memory:",
         pool_size=1,
         pool_recycle=60,
@@ -25,7 +25,7 @@ def database_settings() -> DatabaseSettings:
 
 @pytest_asyncio.fixture
 async def repositories_container(
-    database_settings: DatabaseSettings,
+    database_settings: RepositorySettings,
 ) -> AsyncGenerator[RepositoriesContainer, None]:
     container = RepositoriesContainer(settings=database_settings)
     yield container
@@ -43,7 +43,7 @@ async def user_repository(
 
 @pytest_asyncio.fixture
 async def product_repository_settings(
-    database_settings: DatabaseSettings,
+    database_settings: RepositorySettings,
 ) -> AsyncGenerator[ProductRepository, None]:
     repository = ProductRepository(settings=database_settings)
     await repository.create_tables()

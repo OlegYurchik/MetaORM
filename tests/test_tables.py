@@ -1,7 +1,6 @@
 import pytest
-from sqlmodel import Field
 
-from metaorm import BaseTable
+from metaorm import BaseTable, Field
 from tests.models import User
 
 
