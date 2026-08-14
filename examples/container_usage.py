@@ -78,6 +78,10 @@ async def main() -> None:
     print(f"Orders: {[(order.user_id, order.total) for order in orders]}")
     print(f"Orders count: {len(orders)}")
 
+    # Get single user by name
+    single_user = await user_repo.get_item(filter_=UserFilter(name="Alice"))
+    print(f"Single user: {single_user.name if single_user else None}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

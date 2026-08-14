@@ -68,13 +68,21 @@ class BaseRepository:
 
         return items_count
 
+    async def get_item(
+        self,
+        filter_: BaseFilter | None = None,
+        sort: BaseSort | None = None,
+    ) -> BaseModel | None:
+        async for item in self.get_items(filter_=filter_, sort=sort):
+            return item
+
     async def get_items(
         self,
         filter_: BaseFilter | None = None,
         pagination: BasePagination | None = None,
         sort: BaseSort | None = None,
         options: Sequence[Any] | None = None,
-    ) -> AsyncGenerator[Any]:
+    ) -> AsyncGenerator[BaseModel]:
         table = self.get_table_type()
         statement = select(table)
         statement = append_to_statement(

@@ -78,6 +78,16 @@ class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilte
 
 Note: `pydantic-filters` from GitHub is required for filter support (PyPI version is broken with pydantic v2). The project currently uses a fork with Python 3.14 lazy-annotations support: `git+https://github.com/OlegYurchik/pydantic-filters.git@fix/compare-to-pydantic-2.12`.
 
+#### Single item retrieval
+
+`get_item(filter_=..., sort=...)` returns the first matching record (or `None` if no records match). It delegates to `get_items` under the hood, so filter and sort semantics are identical:
+
+```python
+user = await user_repository.get_item(filter_=UserFilter(email="alice@example.com"))
+if user is not None:
+    print(user.name)
+```
+
 #### Eager loading (options)
 
 `get_items()` and `update_items()` accept an optional `options` parameter for SQLAlchemy eager loading strategies such as `joinedload` or `selectinload`:

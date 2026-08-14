@@ -54,6 +54,11 @@ async def main() -> None:
     count = await repository.get_items_count()
     print(f"Items after nested rollback: {count}")  # 2
 
+    # Read single item inside a transaction
+    async with repository.transaction():
+        item = await repository.get_item(filter_=ProductFilter(name="Laptop"))
+        print(f"Single in transaction: {item.name if item else None}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

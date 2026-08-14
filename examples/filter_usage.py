@@ -40,8 +40,12 @@ async def main() -> None:
             BookTable(title=f"Book {index}", year=2020 + index),
         )
 
-    # Filter by year = 2025
+    # Get single item by filter
     year_filter = BookFilter(year=2025)
+    single = await repository.get_item(filter_=year_filter)
+    print(f"Single year = 2025: {single.title if single else None}")
+
+    # Filter by year = 2025
     filtered = [item async for item in repository.get_items(filter_=year_filter)]
     print(f"Year = 2025: {[book.title for book in filtered]}")
 

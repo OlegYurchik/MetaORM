@@ -32,6 +32,16 @@ async def main() -> None:
     )
     print(f"Created: {user.name}, {user.email}")
 
+    # Read single item
+    single = await repository.get_item()
+    print(f"Single item: {single.name}, {single.email}")
+
+    # Read by filter
+    filtered = await repository.get_item(
+        filter_=UserFilter(email="alice@example.com"),
+    )
+    print(f"Filtered item: {filtered.name if filtered else None}")
+
     # Read all
     items = [item async for item in repository.get_items()]
     print(f"All items: {[(item.name, item.email) for item in items]}")

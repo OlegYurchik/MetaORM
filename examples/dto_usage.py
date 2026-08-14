@@ -47,6 +47,12 @@ async def main() -> None:
     )
     print(f"Created DTO: {user.model_dump()}")
 
+    # Read single DTO
+    single = await repository.get_item(
+        filter_=UserFilter(email="alice@example.com"),
+    )
+    print(f"Single DTO: {single.model_dump() if single else None}")
+
     # Read all — returned as DTOs
     items = [item async for item in repository.get_items()]
     print(f"Items as DTOs: {[item.model_dump() for item in items]}")

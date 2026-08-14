@@ -177,6 +177,68 @@ class TestBaseRepository:
         assert product_repository.get_dto_type() is None
         assert user_repository.get_dto_type() is User
 
+    async def test_get_item_returns_first_item(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        await user_repository.create_item(
+            User(name="Alice", email="alice@example.com"),
+        )
+        await user_repository.create_item(
+            User(name="Bob", email="bob@example.com"),
+        )
+
+        item = await user_repository.get_item()
+
+        assert item is not None
+        assert item.name == "Alice"
+
+    async def test_get_item_returns_none_when_empty(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        item = await user_repository.get_item()
+
+        assert item is None
+
+    async def test_get_item_with_filter(
+        self,
+        product_repository_settings: ProductRepository,
+    ) -> None:
+        await product_repository_settings.create_item(
+            ProductTable(name="Alpha", price=10.0),
+        )
+        await product_repository_settings.create_item(
+            ProductTable(name="Beta", price=20.0),
+        )
+
+        item = await product_repository_settings.get_item(
+            filter_=ProductFilter(name="Beta"),
+        )
+
+        assert item is not None
+        assert item.name == "Beta"
+
+    async def test_get_item_with_sort(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        await user_repository.create_item(
+            User(name="Charlie", email="c@example.com"),
+        )
+        await user_repository.create_item(
+            User(name="Alice", email="a@example.com"),
+        )
+        await user_repository.create_item(
+            User(name="Bob", email="b@example.com"),
+        )
+
+        sort = BaseSort(sort_by="name", sort_by_order="asc")
+        item = await user_repository.get_item(sort=sort)
+
+        assert item is not None
+        assert item.name == "Alice"
+
     async def test_get_items_count_with_filter(
         self,
         product_repository_settings: ProductRepository,
