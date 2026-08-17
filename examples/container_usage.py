@@ -48,8 +48,12 @@ async def main() -> None:
     user_repo = container.get_repository(UserRepository)
     order_repo = container.get_repository(OrderRepository)
 
-    await user_repo.create_tables()
-    await order_repo.create_tables()
+    # Create tables for all repositories at once via the container
+    await container.create_tables(UserRepository, OrderRepository)
+
+    # Or create tables individually per repository
+    # await user_repo.create_tables()
+    # await order_repo.create_tables()
 
     # Atomic transaction across two repositories
     async with container.transaction():

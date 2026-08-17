@@ -20,6 +20,13 @@ examples/                # Usage examples
     filter_usage.py      # Query filters, pagination and sorting
     relationships.py     # Eager loading with joinedload/selectinload
     container_usage.py   # Multi-repository atomic transactions
+docs/                    # MkDocs documentation
+    index.md             # Home page
+    api.md               # API Reference (auto-generated)
+    examples.md          # Embedded examples
+    guide/               # User guide pages
+.github/workflows/
+    docs.yml             # GitHub Pages deploy workflow
 tests/                   # Pytest suite
     conftest.py          # Fixtures
     models.py            # Test models (User, UserTable, UserRepository)
@@ -156,6 +163,23 @@ uv sync
 # Run specific example
 PYTHONPATH=. .venv/bin/python examples/basic_usage.py
 ```
+
+### Documentation
+
+Documentation is built with MkDocs (Material theme) and deployed to GitHub Pages automatically via `.github/workflows/docs.yml`.
+
+```bash
+# Serve locally with live-reload
+uv run mkdocs serve
+
+# Build static site
+uv run mkdocs build
+
+# Deploy to gh-pages
+uv run mkdocs gh-deploy --force
+```
+
+Docs dependencies: `mkdocs`, `mkdocs-material`, `mkdocstrings[python]`.
 
 ### Test Conventions
 

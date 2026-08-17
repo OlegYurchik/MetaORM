@@ -35,6 +35,14 @@ class RepositoriesContainer:
     def session(self) -> AsyncSession | None:
         return self._session_context.get(None)
 
+    async def create_tables(self, *repository_classes: type[RepositoryType]) -> None:
+        repositories = [
+            await self.get_repository(repository_class=repository_class)
+            for repository_class in repository_classes
+        ]
+        for repository in repositories:
+            await repository.create_tables()
+
     @asynccontextmanager
     async def transaction(self) -> AsyncGenerator[AsyncSession, None]:
         existing_session = self._session_context.get(None)
