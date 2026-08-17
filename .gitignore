@@ -68,5 +68,4 @@ Thumbs.db
 # Project specific
 *.sqlite3
 *.db
-site/
-
+.site/
