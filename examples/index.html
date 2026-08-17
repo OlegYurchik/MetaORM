@@ -1,0 +1,1459 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Async repository layer over SQLModel">
+      
+      
+      
+        <link rel="canonical" href="https://olegyurchik.github.io/MetaORM/examples/">
+      
+      
+        <link rel="prev" href="../api/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Examples - MetaORM</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#examples" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="MetaORM" class="md-header__button md-logo" aria-label="MetaORM" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MetaORM
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Examples
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/OlegYurchik/MetaORM" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OlegYurchik/MetaORM
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guide/getting-started/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Examples
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="MetaORM" class="md-nav__button md-logo" aria-label="MetaORM" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    MetaORM
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/OlegYurchik/MetaORM" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OlegYurchik/MetaORM
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/tables-dto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tables & DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/repositories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repositories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters & Pagination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Repo Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/relationships/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eager Loading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metaorm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dto-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DTO Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nested-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filters-pagination-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters, Pagination &amp; Sorting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eager-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eager Loading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-repo-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Repo Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dto-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DTO Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nested-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filters-pagination-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters, Pagination &amp; Sorting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eager-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eager Loading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-repo-transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Repo Transactions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h1>
+<p>All examples are located in the <a href="https://github.com/OlegYurchik/metaorm/tree/main/examples"><code>examples/</code></a> directory and can be run directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">PYTHONPATH</span><span class="o">=</span>.<span class="w"> </span>.venv/bin/python<span class="w"> </span>examples/basic_usage.py
+</code></pre></div>
+<h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings</p>
+<p>class UserTable(BaseTable, table=True):
+    <strong>tablename</strong> = "users"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+email: str = Field(unique=True)
+</code></pre></div>
+<p>class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None</p>
+<p>class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = UserRepository(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>await repository.create_tables()
+
+# Create
+user = await repository.create_item(
+    UserTable(name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;),
+)
+print(f&quot;Created: {user.name}, {user.email}&quot;)
+
+# Read single item
+single = await repository.get_item()
+print(f&quot;Single item: {single.name}, {single.email}&quot;)
+
+# Read by filter
+filtered = await repository.get_item(
+    filter_=UserFilter(email=&quot;alice@example.com&quot;),
+)
+print(f&quot;Filtered item: {filtered.name if filtered else None}&quot;)
+
+# Read all
+items = [item async for item in repository.get_items()]
+print(f&quot;All items: {[(item.name, item.email) for item in items]}&quot;)
+
+# Count
+count = await repository.get_items_count()
+print(f&quot;Count: {count}&quot;)
+
+# Update
+updated = [item async for item in repository.update_items(name=&quot;Updated&quot;)]
+print(f&quot;Updated: {[(item.name, item.email) for item in updated]}&quot;)
+
+# Delete
+await repository.delete_items()
+count = await repository.get_items_count()
+print(f&quot;Count after delete: {count}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="dto-usage">DTO Usage<a class="headerlink" href="#dto-usage" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from pydantic import BaseModel</p>
+<p>from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings</p>
+<p>class User(BaseModel):
+    id: int | None = None
+    name: str
+    email: str</p>
+<p>class UserTable(BaseTable[User], table=True):
+    <strong>tablename</strong> = "users"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+email: str = Field(unique=True)
+
+@classmethod
+def from_item(cls, item: User) -&gt; &quot;UserTable&quot;:
+    return cls(id=item.id, name=item.name, email=item.email)
+
+def to_item(self) -&gt; User:
+    return User(id=self.id, name=self.name, email=self.email)
+</code></pre></div>
+<p>class UserFilter(BaseFilter):
+    name: str | None = None
+    email: str | None = None</p>
+<p>class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter, dto=User):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = UserRepository(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>await repository.create_tables()
+
+# Create using DTO
+user = await repository.create_item(
+    User(name=&quot;Alice&quot;, email=&quot;alice@example.com&quot;),
+)
+print(f&quot;Created DTO: {user.model_dump()}&quot;)
+
+# Read single DTO
+single = await repository.get_item(
+    filter_=UserFilter(email=&quot;alice@example.com&quot;),
+)
+print(f&quot;Single DTO: {single.model_dump() if single else None}&quot;)
+
+# Read all — returned as DTOs
+items = [item async for item in repository.get_items()]
+print(f&quot;Items as DTOs: {[item.model_dump() for item in items]}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="transactions">Transactions<a class="headerlink" href="#transactions" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings</p>
+<p>class ProductTable(BaseTable, table=True):
+    <strong>tablename</strong> = "products"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+price: float
+</code></pre></div>
+<p>class ProductFilter(BaseFilter):
+    name: str | None = None
+    price: int | None = None</p>
+<p>class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = ProductRepository(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>await repository.create_tables()
+
+# Explicit transaction via repository
+async with repository.transaction():
+    product1 = await repository.create_item(
+        ProductTable(name=&quot;Laptop&quot;, price=999.99),
+    )
+    product2 = await repository.create_item(
+        ProductTable(name=&quot;Mouse&quot;, price=29.99),
+    )
+    print(f&quot;Created in transaction: {product1.name}, {product2.name}&quot;)
+
+# Reusing an existing session (no new savepoint)
+async with repository.transaction(), repository.transaction():
+    items = [item async for item in repository.get_items()]
+    print(f&quot;Items in reused session: {len(items)}&quot;)
+
+# True nested transaction (savepoint) via repository
+try:
+    async with repository.nested_transaction():
+        await repository.create_item(
+            ProductTable(name=&quot;Keyboard&quot;, price=79.99),
+        )
+        raise ValueError(&quot;Rollback nested&quot;)
+except ValueError:
+    pass
+
+count = await repository.get_items_count()
+print(f&quot;Items after nested rollback: {count}&quot;)  # 2
+
+# Read single item inside a transaction
+async with repository.transaction():
+    item = await repository.get_item(filter_=ProductFilter(name=&quot;Laptop&quot;))
+    print(f&quot;Single in transaction: {item.name if item else None}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="nested-transactions">Nested Transactions<a class="headerlink" href="#nested-transactions" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from metaorm import BaseFilter, BaseRepository, BaseTable, Field, RepositorySettings</p>
+<p>class ProductTable(BaseTable, table=True):
+    <strong>tablename</strong> = "products"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+price: float
+</code></pre></div>
+<p>class ProductFilter(BaseFilter):
+    name: str | None = None</p>
+<p>class ProductRepository(BaseRepository, table=ProductTable, filter_=ProductFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = ProductRepository(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>await repository.create_tables()
+
+# Standalone nested transaction: rollback only the inner scope
+try:
+    async with repository.nested_transaction():
+        await repository.create_item(ProductTable(name=&quot;Laptop&quot;, price=999.99))
+        await repository.create_item(ProductTable(name=&quot;Mouse&quot;, price=29.99))
+        raise ValueError(&quot;Simulated error inside nested transaction&quot;)
+except ValueError:
+    pass
+
+count = await repository.get_items_count()
+print(f&quot;Items after standalone nested rollback: {count}&quot;)  # 0
+
+# Nested transaction inside an outer transaction
+async with repository.transaction():
+    await repository.create_item(ProductTable(name=&quot;Keyboard&quot;, price=79.99))
+
+    try:
+        async with repository.nested_transaction():
+            await repository.create_item(
+                ProductTable(name=&quot;Monitor&quot;, price=299.99),
+            )
+            raise ValueError(&quot;Nested rollback&quot;)
+    except ValueError:
+        pass
+
+    # Monitor is rolled back, Keyboard stays in the outer transaction
+    items = [item async for item in repository.get_items()]
+    print(f&quot;Items after partial rollback: {len(items)}&quot;)  # 1
+    print(items[0].name)  # Keyboard
+
+# Verify committed results
+all_items = [item async for item in repository.get_items()]
+print(f&quot;Final items: {[item.name for item in all_items]}&quot;)  # [&quot;Keyboard&quot;]
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="filters-pagination-sorting">Filters, Pagination &amp; Sorting<a class="headerlink" href="#filters-pagination-sorting" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseSort,
+    BaseTable,
+    Field,
+    OffsetPagination,
+    RepositorySettings,
+)</p>
+<p>class BookTable(BaseTable, table=True):
+    <strong>tablename</strong> = "books"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+title: str
+year: int
+</code></pre></div>
+<p>class BookFilter(BaseFilter):
+    title: str | None = None
+    year: int | None = None</p>
+<p>class BookRepository(BaseRepository, table=BookTable, filter_=BookFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    repository = BookRepository(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>await repository.create_tables()
+
+# Seed data
+for index in range(10):
+    await repository.create_item(
+        BookTable(title=f&quot;Book {index}&quot;, year=2020 + index),
+    )
+
+# Get single item by filter
+year_filter = BookFilter(year=2025)
+single = await repository.get_item(filter_=year_filter)
+print(f&quot;Single year = 2025: {single.title if single else None}&quot;)
+
+# Filter by year = 2025
+filtered = [item async for item in repository.get_items(filter_=year_filter)]
+print(f&quot;Year = 2025: {[book.title for book in filtered]}&quot;)
+
+# Filter by exact title
+title_filter = BookFilter(title=&quot;Book 5&quot;)
+filtered = [item async for item in repository.get_items(filter_=title_filter)]
+print(f&quot;Title = &#39;Book 5&#39;: {[book.title for book in filtered]}&quot;)
+
+# Pagination
+pagination = OffsetPagination(offset=2, limit=3)
+page = [item async for item in repository.get_items(pagination=pagination)]
+print(f&quot;Page (offset=2, limit=3): {[book.title for book in page]}&quot;)
+
+# Sorting descending
+sort = BaseSort(sort_by=&quot;year&quot;, sort_by_order=&quot;desc&quot;)
+sorted_items = [item async for item in repository.get_items(sort=sort)]
+print(f&quot;Sorted by year desc: {[book.year for book in sorted_items]}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="eager-loading">Eager Loading<a class="headerlink" href="#eager-loading" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from sqlalchemy.orm import joinedload</p>
+<p>from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseTable,
+    Field,
+    Relationship,
+    RepositoriesContainer,
+    RepositorySettings,
+)</p>
+<p>class AuthorTable(BaseTable, table=True):
+    <strong>tablename</strong> = "authors"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+books: list[&quot;BookTable&quot;] = Relationship(back_populates=&quot;author&quot;)
+</code></pre></div>
+<p>class BookTable(BaseTable, table=True):
+    <strong>tablename</strong> = "books"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+title: str
+author_id: int = Field(foreign_key=&quot;authors.id&quot;)
+author: AuthorTable = Relationship(back_populates=&quot;books&quot;)
+</code></pre></div>
+<p>class BookFilter(BaseFilter):
+    title: str | None = None
+    author_id: int | None = None</p>
+<p>class AuthorFilter(BaseFilter):
+    name: str | None = None</p>
+<p>class BookRepository(BaseRepository, table=BookTable, filter_=BookFilter):
+    pass</p>
+<p>class AuthorRepository(BaseRepository, table=AuthorTable, filter_=AuthorFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    container = RepositoriesContainer(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>author_repo = AuthorRepository(container=container)
+book_repo = BookRepository(container=container)
+
+await author_repo.create_tables()
+await book_repo.create_tables()
+
+# Create author and books
+author = await author_repo.create_item(AuthorTable(name=&quot;Tolkien&quot;))
+await book_repo.create_item(BookTable(title=&quot;The Hobbit&quot;, author_id=author.id))
+await book_repo.create_item(BookTable(title=&quot;LOTR&quot;, author_id=author.id))
+
+# Load books with authors using joinedload
+books = [
+    item
+    async for item in book_repo.get_items(
+        options=[joinedload(BookTable.author)],
+    )
+]
+for book in books:
+    print(f&quot;Book: {book.title}, Author: {book.author.name}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+<h2 id="multi-repo-transactions">Multi-Repo Transactions<a class="headerlink" href="#multi-repo-transactions" title="Permanent link">&para;</a></h2>
+<p>import asyncio</p>
+<p>from metaorm import (
+    BaseFilter,
+    BaseRepository,
+    BaseTable,
+    Field,
+    RepositoriesContainer,
+    RepositorySettings,
+)</p>
+<p>class UserTable(BaseTable, table=True):
+    <strong>tablename</strong> = "users"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+name: str
+</code></pre></div>
+<p>class OrderTable(BaseTable, table=True):
+    <strong>tablename</strong> = "orders"</p>
+<div class="highlight"><pre><span></span><code>id: int | None = Field(default=None, primary_key=True)
+user_id: int
+total: float
+</code></pre></div>
+<p>class UserFilter(BaseFilter):
+    name: str | None = None</p>
+<p>class OrderFilter(BaseFilter):
+    user_id: int | None = None</p>
+<p>class UserRepository(BaseRepository, table=UserTable, filter_=UserFilter):
+    pass</p>
+<p>class OrderRepository(BaseRepository, table=OrderTable, filter_=OrderFilter):
+    pass</p>
+<p>async def main() -&gt; None:
+    settings = RepositorySettings(dsn="sqlite+aiosqlite:///:memory:")
+    container = RepositoriesContainer(settings=settings)</p>
+<div class="highlight"><pre><span></span><code>user_repo = container.get_repository(UserRepository)
+order_repo = container.get_repository(OrderRepository)
+
+# Create tables for all repositories at once via the container
+await container.create_tables(UserRepository, OrderRepository)
+
+# Or create tables individually per repository
+# await user_repo.create_tables()
+# await order_repo.create_tables()
+
+# Atomic transaction across two repositories
+async with container.transaction():
+    user = await user_repo.create_item(UserTable(name=&quot;Alice&quot;))
+    await order_repo.create_item(OrderTable(user_id=user.id, total=100.00))
+    await order_repo.create_item(OrderTable(user_id=user.id, total=250.50))
+
+# Nested transaction inside outer transaction (savepoint)
+async with container.transaction():
+    user = await user_repo.create_item(UserTable(name=&quot;Bob&quot;))
+    try:
+        async with container.nested_transaction():
+            await order_repo.create_item(
+                OrderTable(user_id=user.id, total=999.99),
+            )
+            raise ValueError(&quot;Rollback nested order&quot;)
+    except ValueError:
+        pass
+    # Bob stays, the order is rolled back
+
+# Verify results
+users = [item async for item in user_repo.get_items()]
+orders = [item async for item in order_repo.get_items()]
+
+print(f&quot;Users: {[user.name for user in users]}&quot;)
+print(f&quot;Orders: {[(order.user_id, order.total) for order in orders]}&quot;)
+print(f&quot;Orders count: {len(orders)}&quot;)
+
+# Get single user by name
+single_user = await user_repo.get_item(filter_=UserFilter(name=&quot;Alice&quot;))
+print(f&quot;Single user: {single_user.name if single_user else None}&quot;)
+</code></pre></div>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    asyncio.run(main())</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
