@@ -2,6 +2,8 @@
 
 Async repository layer over [SQLModel](https://sqlmodel.tiangolo.com). Define a table, a repository with keyword arguments, and you have a complete async CRUD layer.
 
+📖 **[Full documentation](https://olegyurchik.github.io/MetaORM/)**
+
 - **Minimal API** — `create_item`, `get_items`, `update_items`, `delete_items`. That's it.
 - **Built-in DTO mapping** — return table instances directly or map to separate Pydantic models.
 - **Intuitive transactions** — every CRUD call runs in a transaction; explicit `transaction()` context manager for custom scopes.
