@@ -1,9 +1,9 @@
 site_name: MetaORM
 site_description: Async repository layer over SQLModel
-site_url: https://olegyurchik.github.io/metaorm/
+site_url: https://olegyurchik.github.io/MetaORM/
 site_dir: .site
-repo_url: https://github.com/OlegYurchik/metaorm
-repo_name: OlegYurchik/metaorm
+repo_url: https://github.com/OlegYurchik/MetaORM
+repo_name: OlegYurchik/MetaORM
 
 theme:
   name: material
