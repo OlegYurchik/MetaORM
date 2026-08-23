@@ -515,7 +515,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "pydantic-filters", git = "https://github.com/OlegYurchik/pydantic-filters?branch=fix%2Fcompare-to-pydantic-2.12" },
+    { name = "pydantic-filters", specifier = ">=0.4.0" },
     { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
 ]
@@ -788,10 +788,14 @@ wheels = [
 
 [[package]]
 name = "pydantic-filters"
-version = "0.0.0"
-source = { git = "https://github.com/OlegYurchik/pydantic-filters?branch=fix%2Fcompare-to-pydantic-2.12#2ca8b822d59feaf5f19f36b570974d314ba5e330" }
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7b/9b/291e0cec0d4b33cef16c734a41926dacf498a7c56b1ac9701b1c067d3f09/pydantic_filters-0.4.0.tar.gz", hash = "sha256:85715ad866e3c4233143717cb9f9a7d1a2ba1753b6bddb79a744e5b43b3b8149", size = 287826, upload-time = "2026-08-18T13:41:20.931Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/2e/041b3c15b0b856f55469dac3c2a6982f25d1ce98a94b30a8a97a2dd69256/pydantic_filters-0.4.0-py3-none-any.whl", hash = "sha256:2ae2c04e1823f46502bb47d5724592f46e30895afbc58bd7abb11e30c934d14a", size = 20901, upload-time = "2026-08-18T13:41:19.983Z" },
 ]
 
 [[package]]

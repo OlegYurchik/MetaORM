@@ -15,12 +15,12 @@ Async repository layer over [SQLModel](https://sqlmodel.tiangolo.com). Define a 
 ## Install
 
 ```bash
-pip install "git+https://github.com/OlegYurchik/metaorm.git"
+pip install metaorm
 ```
 
 Requires Python `>=3.12`.
 
-> **Note:** The package is installed directly from GitHub because `metaorm` depends on a patched version of `pydantic-filters` (from `so-saf/pydantic-filters`) that is not yet available on PyPI.
+> **Note:** `metaorm` depends on a patched version of `pydantic-filters` that is not yet available on PyPI. The dependency is pulled automatically from GitHub during installation.
 
 ## Quick start
 
