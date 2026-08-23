@@ -16,7 +16,7 @@ class UserTable(BaseTable[User], table=True):
     email: str = Field(unique=True)
 
     @classmethod
-    def from_item(cls, item: User) -> "UserTable":
+    def from_item(cls, item: User) -> UserTable:
         return cls(id=item.id, name=item.name, email=item.email)
 
     def to_item(self) -> User:
@@ -52,7 +52,7 @@ class AuthorTable(BaseTable, table=True):
     __tablename__ = "authors"
     id: int | None = Field(default=None, primary_key=True)
     name: str
-    books: list["BookTable"] = Relationship(back_populates="author")
+    books: list[BookTable] = Relationship(back_populates="author")
 
 
 class BookTable(BaseTable, table=True):

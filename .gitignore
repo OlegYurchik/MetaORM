@@ -47,6 +47,7 @@ coverage.xml
 
 # Virtual environments
 .env
+.python-version
 .venv
 env/
 venv/

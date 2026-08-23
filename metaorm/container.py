@@ -44,7 +44,7 @@ class RepositoriesContainer:
             await repository.create_tables()
 
     @asynccontextmanager
-    async def transaction(self) -> AsyncGenerator[AsyncSession, None]:
+    async def transaction(self) -> AsyncGenerator[AsyncSession]:
         existing_session = self._session_context.get(None)
         if existing_session is not None:
             yield existing_session
@@ -63,7 +63,7 @@ class RepositoriesContainer:
                 self._session_context.reset(token)
 
     @asynccontextmanager
-    async def nested_transaction(self) -> AsyncGenerator[AsyncSession, None]:
+    async def nested_transaction(self) -> AsyncGenerator[AsyncSession]:
         existing_session = self._session_context.get(None)
         if existing_session is not None:
             async with existing_session.begin_nested():

@@ -26,7 +26,7 @@ def database_settings() -> RepositorySettings:
 @pytest_asyncio.fixture
 async def repositories_container(
     database_settings: RepositorySettings,
-) -> AsyncGenerator[RepositoriesContainer, None]:
+) -> AsyncGenerator[RepositoriesContainer]:
     container = RepositoriesContainer(settings=database_settings)
     yield container
     await container.engine.dispose()
@@ -35,7 +35,7 @@ async def repositories_container(
 @pytest_asyncio.fixture
 async def user_repository(
     repositories_container: RepositoriesContainer,
-) -> AsyncGenerator[UserRepository, None]:
+) -> AsyncGenerator[UserRepository]:
     repository = repositories_container.get_repository(UserRepository)
     await repository.create_tables()
     yield repository
@@ -44,7 +44,7 @@ async def user_repository(
 @pytest_asyncio.fixture
 async def product_repository_settings(
     database_settings: RepositorySettings,
-) -> AsyncGenerator[ProductRepository, None]:
+) -> AsyncGenerator[ProductRepository]:
     repository = ProductRepository(settings=database_settings)
     await repository.create_tables()
     yield repository
@@ -53,7 +53,7 @@ async def product_repository_settings(
 @pytest_asyncio.fixture
 async def book_repository(
     repositories_container: RepositoriesContainer,
-) -> AsyncGenerator[BookRepository, None]:
+) -> AsyncGenerator[BookRepository]:
     repository = repositories_container.get_repository(BookRepository)
     await repository.create_tables()
     yield repository
@@ -62,7 +62,7 @@ async def book_repository(
 @pytest_asyncio.fixture
 async def author_repository(
     repositories_container: RepositoriesContainer,
-) -> AsyncGenerator[AuthorRepository, None]:
+) -> AsyncGenerator[AuthorRepository]:
     repository = repositories_container.get_repository(AuthorRepository)
     await repository.create_tables()
     yield repository
