@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from typing import TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.pool import StaticPool
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .settings import RepositorySettings
@@ -17,7 +18,9 @@ class RepositoriesContainer:
             "url": settings.dsn,
             "pool_recycle": settings.pool_recycle,
         }
-        if not settings.dsn.startswith("sqlite"):
+        if settings.dsn == "sqlite+aiosqlite:///:memory:":
+            engine_parameters["poolclass"] = StaticPool
+        elif not settings.dsn.startswith("sqlite"):
             engine_parameters["pool_timeout"] = settings.pool_timeout
             engine_parameters["pool_size"] = settings.pool_size
 
@@ -37,7 +40,7 @@ class RepositoriesContainer:
 
     async def create_tables(self, *repository_classes: type[RepositoryType]) -> None:
         repositories = [
-            await self.get_repository(repository_class=repository_class)
+            self.get_repository(repository_class=repository_class)
             for repository_class in repository_classes
         ]
         for repository in repositories:
@@ -60,7 +63,10 @@ class RepositoriesContainer:
                 async with session.begin():
                     yield session
             finally:
-                self._session_context.reset(token)
+                try:
+                    self._session_context.reset(token)
+                except ValueError:
+                    pass
 
     @asynccontextmanager
     async def nested_transaction(self) -> AsyncGenerator[AsyncSession]:
@@ -80,7 +86,10 @@ class RepositoriesContainer:
                 async with session.begin_nested():
                     yield session
             finally:
-                self._session_context.reset(token)
+                try:
+                    self._session_context.reset(token)
+                except ValueError:
+                    pass
 
     def get_repository(self, repository_class: type[RepositoryType]) -> RepositoryType:
         return repository_class(container=self)
